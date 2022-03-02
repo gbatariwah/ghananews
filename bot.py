@@ -1,4 +1,6 @@
 import os
+import sqlite3
+import asyncio
 
 from telebot import types, async_telebot
 from portals.ghanaweb import GhanaWeb
@@ -6,6 +8,7 @@ from portals.myjoyonline import MyJoyOnline
 from urls.links import URLS
 from utils.markups import category_markup
 from dotenv import load_dotenv
+from utils.queries import insert_user, create_users_table
 import logging
 
 ghanaweb = GhanaWeb(URLS['ghanaweb'])
@@ -15,18 +18,41 @@ load_dotenv()
 API_KEY = os.getenv('API_KEY')
 
 bot = async_telebot.AsyncTeleBot(API_KEY)
+db_connection = sqlite3.connect('database.db')
 
+cursor = db_connection.cursor()
+
+cursor.execute(create_users_table)
+db_connection.commit()
 
 # telebot.logger.setLevel(logging.DEBUG)
 
 
 @bot.message_handler(commands=['help', 'start'])
 async def send_welcome(message):
-    print('A user stated using your bot')
+    m = message
+    id = m.from_user.id
+    username = m.from_user.username
+    fname = m.from_user.first_name
+    lname = m.from_user.last_name
+    sdate = m.date
+    user = (id, fname, lname, username, sdate)
+
+    cursor.execute(insert_user, user)
+    db_connection.commit()
+
     await bot.reply_to(message, """\
 Hi {}, I am Ghana News bot.
-I am here to help you read the latest news in Ghana!\
- Enter /portals to get the latest news from GhanaWeb and Myjoyonline
+I am here to help get the latest news from Ghana!
+
+ ➊ /portals - Menu
+ ➋ /ghanaweb - News from GhanaWeb
+ ➌ /myjoyonline - News from MyJoyOnline
+ 
+ 📢 More updates coming!
+ 
+ Developed by @geraldo09 ☄
+ 
 """.format(message.from_user.username))
 
 
@@ -82,7 +108,7 @@ async def send_headlines2(message):
             stories.append(news_item_string)
 
     else:
-        stories = [f"❀ {category.title()} {'' if category == 'news' or category =='opinion' else 'News'} ❀"]
+        stories = [f"❀ {category.title()} {'' if category == 'news' or category == 'opinion' else 'News'} ❀"]
         headlines = myjoyonline.get_latest_news_by_category(category)
 
         for item in headlines:
@@ -114,6 +140,6 @@ async def send_headlines2(message):
     await bot.send_message(message.chat.id, 'Choose a portal', reply_markup=markup)
 
 
-import asyncio
+# db_connection.close()
 
 asyncio.run(bot.infinity_polling())

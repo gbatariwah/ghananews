@@ -68,9 +68,7 @@ class MyJoyOnline:
 
             if has_class:
                 is_section_label = tag.attrs.get('class')[0] == 'col-lg-12'
-                is_opinion_tag = tag.attrs.get('class')[0] == 'col-lg-3'
 
-                print(is_opinion_tag)
                 if is_section_label:
                     if category_name != 'opinion':
                         label = tag.find('h4').string
