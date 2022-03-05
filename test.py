@@ -7,13 +7,12 @@ load_dotenv()
 
 key = os.getenv('API_KEY')
 
-from portals.myjoyonline import MyJoyOnline
+from portals.peacefmonline import PeaceFmOnline
 
 
-myjoyonline = MyJoyOnline(URLS['myjoyonline'])
+peacefmonline = PeaceFmOnline(URLS['peacefmonline'])
 
-# print(myjoyonline.get_latest_news_by_category('opinion'))
 
-print(key)
+print(peacefmonline.get_latest_news_by_category('local'))
 
 

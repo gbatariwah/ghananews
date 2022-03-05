@@ -5,14 +5,16 @@ import asyncio
 from telebot import types, async_telebot
 from portals.ghanaweb import GhanaWeb
 from portals.myjoyonline import MyJoyOnline
+from portals.peacefmonline import PeaceFmOnline
 from urls.links import URLS
-from utils.markups import category_markup
+from utils.markups import category_markup, portals_markup
 from dotenv import load_dotenv
 from utils.queries import insert_user, create_users_table
 import logging
 
 ghanaweb = GhanaWeb(URLS['ghanaweb'])
 myjoyonline = MyJoyOnline(URLS['myjoyonline'])
+peacefmonline = PeaceFmOnline(URLS['peacefmonline'])
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY')
@@ -43,11 +45,12 @@ async def send_welcome(message):
 
     await bot.reply_to(message, """\
 Hi {}, I am Ghana News bot.
-I am here to help get the latest news from Ghana!
+I am here to help you get the latest news from Ghana!
 
  ➊ /portals - Menu
  ➋ /ghanaweb - News from GhanaWeb
  ➌ /myjoyonline - News from MyJoyOnline
+ ➍ /peacefmonline - News from PeaceFmOnline
  
  📢 More updates coming!
  
@@ -122,6 +125,42 @@ async def send_headlines2(message):
         await bot.send_message(message.chat.id, text=o, reply_markup=markup)
 
 
+@bot.message_handler(func=lambda message: '(P)' in message.text)
+@bot.message_handler(commands=['peacefmonline'])
+async def send_headlines2(message):
+    portal_id = '(P)'
+    category = message.text.split(' ')[0].replace('/', '')
+    markup = category_markup(portal_id)
+    top_stories = peacefmonline.get_top_stories()
+
+    if 'peacefmonline' in message.text:
+
+        stories = []
+
+        for story in top_stories:
+
+            if story.get('excerpt'):
+                story_string = f"{story['title']}\n➿➿➿➿➿➿➿➿\n{story['excerpt']}\n{story['link']}\n"
+
+            else:
+                if story.get('category_name'):
+                    story_string = f"{story['category_name']}\n➿➿➿➿➿➿➿➿\n{story['title']}\n{story['link']}\n"
+                else:
+                    story_string = f"{story['title']}\n{story['link']}\n"
+
+            stories.append(story_string)
+
+    else:
+        stories = [f"❀ {category.title()}  ❀"]
+        headlines = peacefmonline.get_latest_news_by_category(category)
+
+        for item in headlines:
+            stories.append(f"{item['title']}\n{item['link']}\n\n{item['date']}")
+
+    for o in stories:
+        await bot.send_message(message.chat.id, text=o, reply_markup=markup)
+
+
 @bot.message_handler(commands=['close'])
 async def send_headlines2(message):
     markup = types.ReplyKeyboardRemove(selective=False)
@@ -131,12 +170,7 @@ async def send_headlines2(message):
 
 @bot.message_handler(commands=['portals'])
 async def send_headlines2(message):
-    markup = types.ReplyKeyboardMarkup(
-        row_width=2, resize_keyboard=True, selective=False)
-    btn1 = types.KeyboardButton('/ghanaweb')
-    btn2 = types.KeyboardButton('/myjoyonline')
-    btn3 = types.KeyboardButton('/close')
-    markup.add(btn1, btn2, btn3)
+    markup = portals_markup()
     await bot.send_message(message.chat.id, 'Choose a portal', reply_markup=markup)
 
 
