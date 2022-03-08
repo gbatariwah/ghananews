@@ -7,12 +7,12 @@ load_dotenv()
 
 key = os.getenv('API_KEY')
 
-from portals.peacefmonline import PeaceFmOnline
+from portals.tv3news import Tv3News
 
 
-peacefmonline = PeaceFmOnline(URLS['peacefmonline'])
+tv3news = Tv3News(URLS['tv3news'])
 
 
-print(peacefmonline.get_latest_news_by_category('local'))
+print(tv3news.get_top_stories())
 
 

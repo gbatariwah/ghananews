@@ -35,10 +35,12 @@ def portals_markup():
         row_width=2, resize_keyboard=True, selective=False)
     btn1 = types.KeyboardButton('/ghanaweb')
     btn2 = types.KeyboardButton('/myjoyonline')
-    btn3 = types.KeyboardButton('/peacefmonline')
-    btn4 = types.KeyboardButton('/close')
+    btn3 = types.KeyboardButton('/3news')
+    btn4 = types.KeyboardButton('/peacefmonline')
+    btn5 = types.KeyboardButton('/close')
 
     markup.row(btn1, btn2)
     markup.row(btn3, btn4)
+    markup.row(btn5)
 
     return markup

@@ -29,5 +29,16 @@ URLS = {
             {'name': 'opinion', 'link': '/pages/comment/'},
         ]
     },
+    'tv3news': {
+        'base': 'https://3news.com',
+        'categories': [
+            {'name': 'news', 'link': '/category/news/'},
+            {'name': 'business', 'link': '/category/business/'},
+            {'name': 'showbiz', 'link': '/pages/showbiz/'},
+            {'name': 'sports', 'link': '/3sports/'},
+            {'name': 'tilapia', 'link': '/category/tilapia/'},
+            {'name': 'world', 'link': '/category/world/'},
+        ]
+    },
 }
 

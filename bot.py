@@ -6,6 +6,7 @@ from telebot import types, async_telebot
 from portals.ghanaweb import GhanaWeb
 from portals.myjoyonline import MyJoyOnline
 from portals.peacefmonline import PeaceFmOnline
+from portals.tv3news import Tv3News
 from urls.links import URLS
 from utils.markups import category_markup, portals_markup
 from dotenv import load_dotenv
@@ -15,6 +16,7 @@ import logging
 ghanaweb = GhanaWeb(URLS['ghanaweb'])
 myjoyonline = MyJoyOnline(URLS['myjoyonline'])
 peacefmonline = PeaceFmOnline(URLS['peacefmonline'])
+tv3news = Tv3News(URLS['tv3news'])
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY')
@@ -123,6 +125,45 @@ async def send_headlines2(message):
 
     for o in stories:
         await bot.send_message(message.chat.id, text=o, reply_markup=markup)
+
+
+@bot.message_handler(func=lambda message: '(T)' in message.text)
+@bot.message_handler(commands=['3news'])
+async def send_headlines2(message):
+    portal_id = '(T)'
+    # category = message.text.split(' ')[0].replace('/', '')
+    # markup = category_markup(portal_id)
+    items = tv3news.get_top_stories()
+    stories = []
+
+    if '3news' in message.text:
+        pass
+        # top_story = headlines['top_story']
+        # news = headlines['news']
+        #
+        #
+        for item in items:
+            if item.get('category_name'):
+                item_string = f"❀ {item['category_name']} ❀\n➿➿➿➿➿➿➿➿➿\n{item['title']}\n{item['link']}\n{item['date']}"
+            else:
+                item_string = f"{item['title']}\n{item['link']}\n"
+
+            stories.append(item_string)
+
+    else:
+        pass
+        # stories = [f"❀ {category.title()} {'' if category == 'news' or category == 'opinion' else 'News'} ❀"]
+        # headlines = myjoyonline.get_latest_news_by_category(category)
+        #
+        # for item in headlines:
+        #     if item.get('section_label'):
+        #         stories.append(f"❀❀ {item['section_label']} ❀❀")
+        #
+        #     else:
+        #         stories.append(f"{item['title']}\n{item['link']}\n")
+
+    for o in stories:
+        await bot.send_message(message.chat.id, text=o)
 
 
 @bot.message_handler(func=lambda message: '(P)' in message.text)
